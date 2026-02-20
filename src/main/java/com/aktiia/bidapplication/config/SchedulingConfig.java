@@ -6,7 +6,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class SchedulingConfig {
-    // Enables @Scheduled annotation support for automatic auction expiration
-    // TODO: Initial idea only, try to think some better solution, like triggering close event from the database or
-    //  using a message queue to handle auction expiration more efficiently and reliably.
+    // Left here for the auctions that are not created regularly, but for testing purposes,
+    // we will use the @Scheduled annotation in the AuctionService to check for expired auctions every 5 minutes and close them if needed.
 }

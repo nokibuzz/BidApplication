@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            String jwt = extractTokenFromRequest(request);
+            final String jwt = extractTokenFromRequest(request);
 
             if (jwt != null && jwtTokenProvider.validateToken(jwt)) {
                 final String username = jwtTokenProvider.getUsernameFromToken(jwt);
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    protected boolean shouldNotFilter(final HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
         return path.startsWith("/h2-console") ||
                 path.startsWith("/api/auth") ||

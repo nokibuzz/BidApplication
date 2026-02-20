@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ public class AuctionController {
     private final AuctionService auctionService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuctionResponse> createAuction(@Valid @RequestBody final AuctionRequest request,
                                                          @AuthenticationPrincipal final UserDetails userDetails) {
         final AuctionResponse response = auctionService.createAuction(request, userDetails.getUsername());
@@ -32,6 +34,7 @@ public class AuctionController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuctionResponse> updateAuction(@PathVariable final UUID id,
                                                          @Valid @RequestBody final AuctionRequest request,
                                                          @AuthenticationPrincipal final UserDetails userDetails) {

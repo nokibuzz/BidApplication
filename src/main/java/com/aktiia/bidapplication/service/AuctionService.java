@@ -3,6 +3,7 @@ package com.aktiia.bidapplication.service;
 import com.aktiia.bidapplication.exception.AuctionClosedException;
 import com.aktiia.bidapplication.exception.BadRequestException;
 import com.aktiia.bidapplication.exception.ResourceNotFoundException;
+import com.aktiia.bidapplication.job.CloseAuctionJob;
 import com.aktiia.bidapplication.model.dto.request.AuctionRequest;
 import com.aktiia.bidapplication.model.dto.response.AuctionResponse;
 import com.aktiia.bidapplication.model.dto.response.AuctionStatusResponse;
@@ -16,9 +17,11 @@ import com.aktiia.bidapplication.repository.BidRepository;
 import com.aktiia.bidapplication.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +34,7 @@ public class AuctionService {
     private final AuctionRepository auctionRepository;
     private final UserRepository userRepository;
     private final BidRepository bidRepository;
+    private final Scheduler scheduler;
 
     @Transactional
     public AuctionResponse createAuction(final AuctionRequest request, final String username) {
@@ -48,6 +52,8 @@ public class AuctionService {
                 .build();
 
         auction = auctionRepository.save(auction);
+        scheduleAuctionCloseJob(auction);
+
         log.info("Auction created: id={}, title='{}', seller={}, endTime={}",
                 auction.getId(), auction.getTitle(), username, auction.getEndTime());
 
@@ -79,9 +85,10 @@ public class AuctionService {
 
         // Allow extending the duration
         if (request.getDurationMinutes() != null) {
-            LocalDateTime newEndTime = auction.getCreatedAt().plusMinutes(request.getDurationMinutes());
+            final LocalDateTime newEndTime = auction.getCreatedAt().plusMinutes(request.getDurationMinutes());
             if (newEndTime.isAfter(LocalDateTime.now())) {
                 auction.setEndTime(newEndTime);
+                rescheduleAuctionCloseJob(auction);
             } else {
                 throw new BadRequestException("New end time must be in the future");
             }
@@ -116,17 +123,17 @@ public class AuctionService {
 
     @Transactional(readOnly = true)
     public AuctionStatusResponse getAuctionStatus(final UUID auctionId) {
-        Auction auction = auctionRepository.findById(auctionId)
+        final Auction auction = auctionRepository.findById(auctionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Auction", "id", auctionId));
 
-        List<Bid> recentBids = bidRepository.findTopBidsByAuctionId(auctionId, 10);
+        final List<Bid> recentBids = bidRepository.findTopBidsByAuctionId(auctionId, 10);
 
         // Determine the highest bidder
-        String highestBidderUsername = recentBids.isEmpty()
+        final String highestBidderUsername = recentBids.isEmpty()
                 ? null
                 : recentBids.getFirst().getBidder().getUsername();
 
-        List<BidResponse> bidResponses = recentBids.stream()
+        final List<BidResponse> bidResponses = recentBids.stream()
                 .map(this::mapBidToResponse)
                 .toList();
 
@@ -141,6 +148,42 @@ public class AuctionService {
                 .totalBids(bidRepository.countByAuctionId(auctionId))
                 .recentBids(bidResponses)
                 .build();
+    }
+
+    private void scheduleAuctionCloseJob(final Auction auction) {
+        try {
+
+            final JobDetail jobDetail = JobBuilder.newJob(CloseAuctionJob.class)
+                    .withIdentity("closeAuctionJob-" + auction.getId())
+                    .usingJobData("auctionId", String.valueOf(auction.getId()))
+                    .storeDurably()
+                    .build();
+
+            final Trigger trigger = TriggerBuilder.newTrigger()
+                    .withIdentity("closeAuctionTrigger-" + auction.getId())
+                    .startAt(Timestamp.valueOf(auction.getEndTime()))
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                            .withMisfireHandlingInstructionFireNow())
+                    .build();
+
+            scheduler.scheduleJob(jobDetail, trigger);
+
+        } catch (final SchedulerException e) {
+            throw new RuntimeException("Failed to schedule auction close job", e);
+        }
+    }
+
+    private void deleteAuctionCloseJob(final UUID auctionId) {
+        try {
+            scheduler.deleteJob(new JobKey("closeAuctionJob-" + auctionId));
+        } catch (final SchedulerException e) {
+            log.warn("Failed to delete auction close job for auctionId={}", auctionId, e);
+        }
+    }
+
+    private void rescheduleAuctionCloseJob(final Auction auction) {
+        deleteAuctionCloseJob(auction.getId());
+        scheduleAuctionCloseJob(auction);
     }
 
     private AuctionResponse mapToResponse(final Auction auction) {
@@ -158,7 +201,7 @@ public class AuctionService {
                 .build();
     }
 
-    private BidResponse mapBidToResponse(Bid bid) {
+    private BidResponse mapBidToResponse(final Bid bid) {
         return BidResponse.builder()
                 .id(bid.getId())
                 .amount(bid.getAmount())

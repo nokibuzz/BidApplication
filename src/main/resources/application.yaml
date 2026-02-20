@@ -24,6 +24,19 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     contexts: dev
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: always
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: AuctionScheduler
+          jobStore:
+            isClustered: true
+          threadPool:
+            threadCount: 5
 
 springdoc:
   swagger-ui:
@@ -40,4 +53,4 @@ app:
 
 auction:
   scheduler:
-    fixed-rate-ms: 10000  # Check for expired auctions every 10 seconds
+    fixed-rate-ms: 600000  # Check for expired auctions every 10 minutes

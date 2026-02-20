@@ -26,14 +26,14 @@ public class JwtTokenProvider {
         this.jwtExpirationMs = jwtExpirationMs;
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateToken(final Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         return generateToken(userDetails.getUsername());
     }
 
-    public String generateToken(String username) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+    public String generateToken(final String username) {
+        final Date now = new Date();
+        final Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
         return Jwts.builder()
                 .subject(username)
@@ -43,7 +43,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(final String token) {
         return Jwts.parser()
                 .verifyWith(signingKey)
                 .build()
@@ -52,7 +52,7 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(final String token) {
         try {
             Jwts.parser()
                     .verifyWith(signingKey)

@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ public class BidController {
     private final BidService bidService;
 
     @PostMapping
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<BidResponse> placeBid(@PathVariable final UUID auctionId,
                                                 @Valid @RequestBody final BidRequest request,
                                                 @AuthenticationPrincipal final UserDetails userDetails) {

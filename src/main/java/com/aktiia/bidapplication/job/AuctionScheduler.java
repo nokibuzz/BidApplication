@@ -22,7 +22,7 @@ public class AuctionScheduler {
     @Scheduled(fixedRateString = "${auction.scheduler.fixed-rate-ms}")
     @Transactional
     public void closeExpiredAuctions() {
-        List<Auction> expiredAuctions = auctionRepository.findExpiredAuctions(
+        final List<Auction> expiredAuctions = auctionRepository.findExpiredAuctions(
                 AuctionStatus.OPEN,
                 LocalDateTime.now()
         );
