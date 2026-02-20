@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-auction-table
+      author: petar.nojner
+      changes:
+        - createTable:
+            tableName: auction
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(1000)
+              - column:
+                  name: starting_price
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: current_highest_bid
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: 0.00
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+                  defaultValue: OPEN
+              - column:
+                  name: seller_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_auction_seller
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: end_time
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0

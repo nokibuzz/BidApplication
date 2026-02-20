@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-bid-table
+      author: petar.nojner
+      changes:
+        - createTable:
+            tableName: bid
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: auction_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_bid_auction
+                    references: auction(id)
+              - column:
+                  name: bidder_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_bid_bidder
+                    references: users(id)
+              - column:
+                  name: placed_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: CURRENT_TIMESTAMP
+        - createIndex:
+            indexName: idx_bid_auction_id
+            tableName: bid
+            columns:
+              - column:
+                  name: auction_id
+        - createIndex:
+            indexName: idx_bid_bidder_id
+            tableName: bid
+            columns:
+              - column:
+                  name: bidder_id

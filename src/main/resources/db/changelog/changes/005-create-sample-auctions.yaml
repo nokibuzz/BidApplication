@@ -1,0 +1,105 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-sample-auctions
+      author: petar.nojner
+      context: "!test"
+      changes:
+        - insert:
+            tableName: auction
+            columns:
+              - column:
+                  name: id
+                  value: '306c34da-03cd-4561-af6e-d03a0968e432'
+              - column:
+                  name: title
+                  value: "Some example auction"
+              - column:
+                  name: description
+                  value: "Example auction that is created for testing purposes initially."
+              - column:
+                  name: starting_price
+                  valueNumeric: 250.00
+              - column:
+                  name: current_highest_bid
+                  valueNumeric: 250.00
+              - column:
+                  name: status
+                  value: OPEN
+              - column:
+                  name: seller_id
+                  value: '8e10d646-42eb-4f45-9830-7f9d66ee3bfc'
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: end_time
+                  valueComputed: "DATEADD('HOUR', 24, CURRENT_TIMESTAMP)"
+              - column:
+                  name: version
+                  valueNumeric: 0
+        - insert:
+            tableName: auction
+            columns:
+              - column:
+                  name: id
+                  value: '9ce61aa0-7069-4889-9231-a328c24e7f19'
+              - column:
+                  name: title
+                  value: "Gaming Laptop RTX 4080"
+              - column:
+                  name: description
+                  value: "High-performance gaming laptop, barely used. 64GB RAM, 2TB SSD, 17-inch 240Hz display."
+              - column:
+                  name: starting_price
+                  valueNumeric: 1200.00
+              - column:
+                  name: current_highest_bid
+                  valueNumeric: 1200.00
+              - column:
+                  name: status
+                  value: OPEN
+              - column:
+                  name: seller_id
+                  value: '8e10d646-42eb-4f45-9830-7f9d66ee3bfc'
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: end_time
+                  valueComputed: "DATEADD('HOUR', 48, CURRENT_TIMESTAMP)"
+              - column:
+                  name: version
+                  valueNumeric: 0
+        - insert:
+            tableName: auction
+            columns:
+              - column:
+                  name: id
+                  value: '81fa1709-c7c9-4609-9b76-911c6a9d21a0'
+              - column:
+                  name: title
+                  value: "First Edition Harry Potter Book (one of the most valuable books in the world)"
+              - column:
+                  name: description
+                  value: "Rare first edition copy of Harry Potter and the Philosopher's Stone. Excellent condition, hardcover."
+              - column:
+                  name: starting_price
+                  valueNumeric: 5000.00
+              - column:
+                  name: current_highest_bid
+                  valueNumeric: 5000.00
+              - column:
+                  name: status
+                  value: OPEN
+              - column:
+                  name: seller_id
+                  value: '32f3d169-ba92-4067-87af-17887fd60f19'
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: end_time
+                  valueComputed: "DATEADD('HOUR', 72, CURRENT_TIMESTAMP)"
+              - column:
+                  name: version
+                  valueNumeric: 0

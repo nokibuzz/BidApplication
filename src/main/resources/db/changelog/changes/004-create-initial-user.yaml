@@ -1,0 +1,72 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-initial-user
+      author: petar.nojner
+      context: "!test"
+      changes:
+        # admin user
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: '548280f2-bf83-471e-ab8b-64319beefe86'
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: email
+                  value: admin@aktiia.com
+              - column:
+                  name: password
+                  value: "$2a$10$cuSnSFLfxVuBSglWA9OPsOh426b8N6tWRP5rM9o56QcnjvOj9mZtm"
+              - column:
+                  name: role
+                  value: ROLE_ADMIN
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
+        # regular user: noki
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: '8e10d646-42eb-4f45-9830-7f9d66ee3bfc'
+              - column:
+                  name: username
+                  value: noki
+              - column:
+                  name: email
+                  value: noki@aktiia.com
+              - column:
+                  name: password
+                  value: "$2a$10$cuSnSFLfxVuBSglWA9OPsOh426b8N6tWRP5rM9o56QcnjvOj9mZtm"
+              - column:
+                  name: role
+                  value: ROLE_USER
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
+        # regular user: blagoje
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: '32f3d169-ba92-4067-87af-17887fd60f19'
+              - column:
+                  name: username
+                  value: blagoje
+              - column:
+                  name: email
+                  value: blagoje@aktiia.com
+              - column:
+                  name: password
+                  value: "$2a$10$cuSnSFLfxVuBSglWA9OPsOh426b8N6tWRP5rM9o56QcnjvOj9mZtm"
+              - column:
+                  name: role
+                  value: ROLE_USER
+              - column:
+                  name: created_at
+                  valueComputed: CURRENT_TIMESTAMP
