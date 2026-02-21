@@ -44,6 +44,17 @@ Swagger UI is available at:
 http://localhost:8080/swagger-ui.html
 ```
 
+### API Usage (on Swagger e.g.)
+1. **Authentication**: Use the `/auth/login` endpoint to obtain a JWT token by providing valid credentials (e.g., `admin/password`).
+2. **Authorization**: For protected endpoints, include the obtained JWT token in the `Authorization` header as `Bearer <token>` to access the resources.
+3. **Testing Endpoints**: Use the Swagger UI to test various API endpoints, ensuring you have the necessary permissions based on your user role.
+4. **Role-Based Access**: Depending on your role (e.g., ADMIN or USER), you will have access to different sets of endpoints. Make sure to test the functionality according to your assigned role.
+
+### Creating admin users
+To create admin users, you can use the `/auth/register` endpoint. Provide the necessary details such as username, password,
+it is important to include `admin` word into the username to ensure the user is assigned the ADMIN role.
+For example, you can create a user with the username `adminJohn` and password `password` to have admin privileges.
+
 ---
 
 ## 👤 Default Users

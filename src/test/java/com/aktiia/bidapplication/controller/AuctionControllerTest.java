@@ -5,6 +5,7 @@ import com.aktiia.bidapplication.auth.JwtTokenProvider;
 import com.aktiia.bidapplication.config.SecurityConfig;
 import com.aktiia.bidapplication.model.dto.request.AuctionRequest;
 import com.aktiia.bidapplication.model.dto.response.AuctionResponse;
+import com.aktiia.bidapplication.model.dto.response.AuctionStatusResponse;
 import com.aktiia.bidapplication.service.AuctionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,10 +25,15 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static com.aktiia.bidapplication.model.enums.AuctionStatus.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(AuctionController.class)
@@ -91,8 +97,8 @@ class AuctionControllerTest {
     }
 
     @Nested
-    @DisplayName("Validation Tests for Auctions")
-    class ValidationTests {
+    @DisplayName("Create Auction Tests")
+    class CreateAuctionTests {
 
         @Test
         @WithMockUser(roles = "ADMIN")
@@ -119,18 +125,103 @@ class AuctionControllerTest {
         @Test
         @WithMockUser(roles = "USER")
         void getAuctionReturnsOk() throws Exception {
-            given(auctionService.getAuction(auctionId)).willReturn(AuctionResponse.builder().build());
+            AuctionResponse response = AuctionResponse.builder()
+                    .id(auctionId)
+                    .title("Test Auction")
+                    .build();
+
+            given(auctionService.getAuction(auctionId)).willReturn(response);
 
             mockMvc.perform(get("/api/auctions/{id}", auctionId))
-                    .andExpect(status().isOk());
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.title").value("Test Auction"));
+
+            then(auctionService).should().getAuction(auctionId);
+        }
+    }
+
+    @Nested
+    @DisplayName("Update Auction Tests")
+    class UpdateAuctionTests {
+
+        @Test
+        @WithMockUser(username = "adminUser", roles = "ADMIN")
+        void updateAuctionAsAdminReturnsOk() throws Exception {
+            final AuctionResponse response = AuctionResponse.builder()
+                    .id(auctionId)
+                    .title("Updated Auction")
+                    .build();
+
+            given(auctionService.updateAuction(eq(auctionId), any(), eq("adminUser")))
+                    .willReturn(response);
+
+            mockMvc.perform(put("/api/auctions/{id}", auctionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validRequest)))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.title").value("Updated Auction"));
+
+            then(auctionService).should()
+                    .updateAuction(eq(auctionId), any(), eq("adminUser"));
         }
 
         @Test
-        void getAllAuctionsPublicAccessReturnsOk() throws Exception {
-            given(auctionService.getAllAuctions()).willReturn(List.of());
+        @WithMockUser(roles = "USER")
+        void updateAuctionAsUserReturnsForbidden() throws Exception {
+            mockMvc.perform(put("/api/auctions/{id}", auctionId)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validRequest)))
+                    .andExpect(status().isForbidden());
+        }
+    }
+
+    @Nested
+    @DisplayName("Get All Auctions Tests")
+    class GetAllAuctionsTests {
+
+        @Test
+        void getAllAuctionsReturnsAll() throws Exception {
+            given(auctionService.getAllAuctions())
+                    .willReturn(List.of(AuctionResponse.builder().build()));
 
             mockMvc.perform(get("/api/auctions"))
                     .andExpect(status().isOk());
+
+            then(auctionService).should().getAllAuctions();
+        }
+
+        @Test
+        void getOnlyOpenAuctionsReturnsOpenOnes() throws Exception {
+            given(auctionService.getOpenAuctions())
+                    .willReturn(List.of(AuctionResponse.builder().build()));
+
+            mockMvc.perform(get("/api/auctions")
+                            .param("openOnly", "true"))
+                    .andExpect(status().isOk());
+
+            then(auctionService).should().getOpenAuctions();
+        }
+    }
+
+    @Nested
+    @DisplayName("Get Auction Status Tests")
+    class GetAuctionStatusTests {
+
+        @Test
+        void getAuctionStatusReturnsOk() throws Exception {
+            final AuctionStatusResponse statusResponse = AuctionStatusResponse.builder()
+                    .auctionId(auctionId)
+                    .status(OPEN)
+                    .build();
+
+            given(auctionService.getAuctionStatus(auctionId))
+                    .willReturn(statusResponse);
+
+            mockMvc.perform(get("/api/auctions/{id}/status", auctionId))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value("OPEN"));
+
+            then(auctionService).should().getAuctionStatus(auctionId);
         }
     }
 }

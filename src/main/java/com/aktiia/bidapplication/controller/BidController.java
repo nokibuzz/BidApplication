@@ -25,7 +25,7 @@ public class BidController {
     private final BidService bidService;
 
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<BidResponse> placeBid(@PathVariable final UUID auctionId,
                                                 @Valid @RequestBody final BidRequest request,
                                                 @AuthenticationPrincipal final UserDetails userDetails) {

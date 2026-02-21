@@ -63,13 +63,12 @@ class ConcurrentBiddingIntegrationTest {
         final User seller = userRepository.save(
                 User.builder()
                         .username("auction_seller")
-                        .email("seller@auction.com")
-                        .password("encoded_password")
-                        .role(Role.ROLE_USER)
+                        .email("seller@aktiia.com")
+                        .password("password")
+                        .role(Role.ROLE_ADMIN)
                         .build()
         );
 
-        // Create an auction with a generous time window
         auction = auctionRepository.save(
                 Auction.builder()
                         .title("High-Demand Auction")
@@ -87,8 +86,8 @@ class ConcurrentBiddingIntegrationTest {
             User bidder = userRepository.save(
                     User.builder()
                             .username("bidder_" + i)
-                            .email("bidder_" + i + "@auction.com")
-                            .password("encoded_password")
+                            .email("bidder_" + i + "@aktiia.com")
+                            .password("password")
                             .role(Role.ROLE_USER)
                             .build()
             );

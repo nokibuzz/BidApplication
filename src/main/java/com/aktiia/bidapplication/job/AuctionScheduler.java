@@ -39,5 +39,7 @@ public class AuctionScheduler {
 
         auctionRepository.saveAll(expiredAuctions);
         log.info("Closed {} expired auction(s)", expiredAuctions.size());
+
+        // TODO: OUT OF SCOPE: Notify users about closed auctions (e.g. via email), will not be done in this implementation
     }
 }

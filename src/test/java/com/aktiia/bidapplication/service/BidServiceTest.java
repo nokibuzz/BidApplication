@@ -62,7 +62,7 @@ class BidServiceTest {
         seller = User.builder()
                 .id(sellerId)
                 .username("seller1")
-                .email("seller@test.com")
+                .email("seller@aktiia.com")
                 .password("encoded")
                 .role(Role.ROLE_USER)
                 .build();
@@ -70,7 +70,7 @@ class BidServiceTest {
         bidder = User.builder()
                 .id(bidderId)
                 .username("bidder1")
-                .email("bidder@test.com")
+                .email("bidder@aktiia.com")
                 .password("encoded")
                 .role(Role.ROLE_USER)
                 .build();

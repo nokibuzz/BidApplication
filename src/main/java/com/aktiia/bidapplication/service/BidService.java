@@ -48,6 +48,7 @@ public class BidService {
 
         // Validate auction is still open
         if (auction.getStatus() == AuctionStatus.CLOSED) {
+            log.error("Closing auction {}", auctionId);
             throw new AuctionClosedException("This auction is closed and no longer accepts bids");
         }
 
@@ -64,11 +65,14 @@ public class BidService {
 
         // Seller cannot bid on their own auction
         if (auction.getSeller().getId().equals(bidder.getId())) {
+            log.error("User {} attempted to bid on their own auction {}", username, auctionId);
             throw new BadRequestException("You cannot bid on your own auction");
         }
 
         // Validate bid amount is higher than current highest
         if (request.getAmount().compareTo(auction.getCurrentHighestBid()) <= 0) {
+            log.error("Bid too low: user={}, auctionId={}, bidAmount={}, currentHighest={}",
+                    username, auctionId, request.getAmount(), auction.getCurrentHighestBid());
             throw new BidTooLowException(
                     "Bid must be higher than current highest bid of " + auction.getCurrentHighestBid()
             );

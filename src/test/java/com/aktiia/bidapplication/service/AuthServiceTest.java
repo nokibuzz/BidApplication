@@ -64,7 +64,7 @@ class AuthServiceTest {
         savedUser = User.builder()
                 .id(UUID.randomUUID())
                 .username("testuser")
-                .email("test@example.com")
+                .email("test@aktiia.com")
                 .password("encodedPassword")
                 .role(Role.ROLE_USER)
                 .build();

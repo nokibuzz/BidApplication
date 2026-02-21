@@ -62,7 +62,7 @@ class AuctionServiceTest {
         seller = User.builder()
                 .id(sellerId)
                 .username("seller1")
-                .email("seller@test.com")
+                .email("seller@aktiia.com")
                 .password("encoded")
                 .role(Role.ROLE_USER)
                 .build();

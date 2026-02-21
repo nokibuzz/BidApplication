@@ -37,11 +37,18 @@ public class AuthService {
             throw new BadRequestException("Email '" + request.getEmail() + "' is already registered");
         }
 
+        // Simple role assignment logic: if username contains "admin", assign ROLE_ADMIN, otherwise ROLE_USER
+        Role assignedRole = Role.ROLE_USER;
+        if (request.getUsername().contains("admin")) {
+            log.info("Attempting to register admin user {}", request.getUsername());
+            assignedRole = Role.ROLE_ADMIN;
+        }
+
         final User user = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.ROLE_USER)
+                .role(assignedRole)
                 .build();
 
         userRepository.save(user);
