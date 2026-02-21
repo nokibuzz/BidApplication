@@ -82,3 +82,4 @@ On startup, **3 example auctions** are automatically created for testing purpose
 * H2 Database
 * Swagger (OpenAPI)
 * Gradle
+* Quartz Scheduler
